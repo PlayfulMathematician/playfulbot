@@ -44,6 +44,22 @@ client.on(Events.MessageReactionAdd, async (reaction, user, details) => {
   const member = await reaction.message.guild.members.fetch(user.id);
   await member.roles.add(roleID);
 });
+
+client.on(Events.MessageReactionRemove, async (reaction, user, details) => {
+  const db = readFromData();
+
+  let msgRoleData = db?.["reactionroles"]?.[reaction.message.guildId]?.[reaction.message.id];
+  if (!msgRoleData) {
+    return;
+  }
+  let roleID = msgRoleData?.[reaction.emoji.id];
+  if (!roleID) {
+    return;
+  }
+  const member = await reaction.message.guild.members.fetch(user.id);
+  await member.roles.remove(roleID);
+});
+
 client.on(Events.ClientReady, async readyClient => {
   for (const guild of readyClient.guilds.cache.values()) {
     if (guild.id !== SERVER_ID) {
@@ -101,7 +117,7 @@ client.on(Events.InteractionCreate, async interaction => {
     writeToData(db);
 
     await interaction.reply({
-      content: "Reaction role created ✅",
+      content: "Reaction role created",
       ephemeral: true
     });
   }
