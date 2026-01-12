@@ -66,6 +66,7 @@ client.on(Events.ClientReady, async readyClient => {
       await guild.leave()
     }
   }
+  GuildAvailable = 'guildAvailable'
   console.log(`Logged in as ${readyClient.user.tag}!`);
 });
 
@@ -93,7 +94,11 @@ client.on(Events.MessageCreate, async message => {
   );
   await message.reply('slash commands synced');
 });
-
+client.on(Events.GuildCreate, async guild => {
+  if (guild.id === SERVER_ID) {
+    await guild.leave()
+  }
+});
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName === 'ping') {
